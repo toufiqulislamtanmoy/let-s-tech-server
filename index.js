@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.send("Learning Is Downloading")
+  res.send("Learning Is Downloading")
 })
 
 
@@ -31,25 +31,55 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const userCollections = client.db("language-learning").collection("users");
+    const langCollections = client.db("language-learning").collection("languages");
 
     /********Create user*******/
     app.post("/users", async (req, res) => {
-        const userDetails = req.body;
-        const query = { email: userDetails.email };
-        const existingUser = await userCollections.findOne(query);
-        if (existingUser) {
-            return res.send({ message: "User Already Exist" });
-        }
-        const result = await userCollections.insertOne(userDetails);
-        res.send(result);
+      const userDetails = req.body;
+      const query = { email: userDetails.email };
+      const existingUser = await userCollections.findOne(query);
+      if (existingUser) {
+        return res.send({ message: "User Already Exist" });
+      }
+      const result = await userCollections.insertOne(userDetails);
+      res.send(result);
     })
 
     app.get("/allUsers", async (req, res) => {
-        const result = await userCollections.find().toArray();
-        res.send(result);
+      const result = await userCollections.find().toArray();
+      res.send(result);
 
     })
 
+    /********Find The user Role*******/
+
+    app.get('/role/:email', async (req, res) => {
+      const email = req.params.email;
+      // console.log(email);
+      const query = { email: email }
+      const options = {
+        projection: { role: 1 },
+      };
+      const result = await userCollections.findOne(query, options);
+      res.send(result);
+
+    })
+
+    /********Create Language*******/
+    app.post("/addLang", async (req, res) => {
+      const langDetails = req.body;
+      const query = { langName: langDetails.langName };
+      const existingUser = await langCollections.findOne(query);
+      if (existingUser) {
+        return res.send({ message: "You Already Added" });
+      }
+      const result = await langCollections.insertOne(langDetails);
+      res.send(result);
+    })
+    app.get("/dispLang", async (req, res) => {
+      const result = await langCollections.find().toArray();
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
@@ -68,5 +98,5 @@ run().catch(console.dir);
 
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`)
+  console.log(`Server is running on port ${port}`)
 })
