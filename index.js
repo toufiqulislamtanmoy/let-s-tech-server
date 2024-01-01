@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.vtt9h1d.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -32,6 +32,7 @@ async function run() {
     await client.connect();
     const userCollections = client.db("language-learning").collection("users");
     const langCollections = client.db("language-learning").collection("languages");
+    const moduleCollections = client.db("language-learning").collection("modules");
 
     /********Create user*******/
     app.post("/users", async (req, res) => {
@@ -76,10 +77,38 @@ async function run() {
       const result = await langCollections.insertOne(langDetails);
       res.send(result);
     })
+    // get all language
     app.get("/dispLang", async (req, res) => {
       const result = await langCollections.find().toArray();
       res.send(result);
     })
+    // get single language by id
+    app.get("/single-language/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await langCollections.findOne(query);
+      res.send(result);
+    })
+    // Delete language
+    app.delete("/delete-language/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await langCollections.deleteOne(query);
+      res.send(result);
+    })
+
+    // add Module in the language
+    app.post("/add-module", async (req, res) => {
+      const moduleDetails = req.body;
+      const query = { title: moduleDetails.title };
+      const existingModule = await moduleCollections.findOne(query);
+      if (existingModule) {
+        return res.send({ message: "You Already Added" });
+      }
+      const result = await moduleCollections.insertOne(moduleDetails);
+      res.send(result);
+    })
+
 
 
     // Send a ping to confirm a successful connection
