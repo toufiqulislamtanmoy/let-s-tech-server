@@ -33,6 +33,7 @@ async function run() {
     const userCollections = client.db("language-learning").collection("users");
     const langCollections = client.db("language-learning").collection("languages");
     const moduleCollections = client.db("language-learning").collection("modules");
+    const questionsCollections = client.db("language-learning").collection("questions");
 
     /********Create user*******/
     app.post("/users", async (req, res) => {
@@ -106,6 +107,22 @@ async function run() {
         return res.send({ message: "You Already Added" });
       }
       const result = await moduleCollections.insertOne(moduleDetails);
+      res.send(result);
+    })
+
+    app.get("/all-module", async (req, res) => {
+      const result = await moduleCollections.find().toArray();
+      res.send(result);
+    })
+
+    app.get("/all-questions", async (req, res) => {
+      const result = await questionsCollections.find().sort({ createdAt: -1 }).toArray();
+      res.send(result);
+    })
+    // add question 
+    app.post("/add-question", async (req, res) => {
+      const questionDetails = req.body;
+      const result = await questionsCollections.insertOne(questionDetails);
       res.send(result);
     })
 
