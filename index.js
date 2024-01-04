@@ -34,6 +34,7 @@ async function run() {
     const langCollections = client.db("language-learning").collection("languages");
     const moduleCollections = client.db("language-learning").collection("modules");
     const questionsCollections = client.db("language-learning").collection("questions");
+    const commentCollections = client.db("language-learning").collection("comment");
 
     /********Create user*******/
     app.post("/users", async (req, res) => {
@@ -136,6 +137,23 @@ async function run() {
     app.post("/add-question", async (req, res) => {
       const questionDetails = req.body;
       const result = await questionsCollections.insertOne(questionDetails);
+      res.send(result);
+    })
+    // add comment 
+    app.post("/add-comment", async (req, res) => {
+      const commentDetails = req.body;
+      const result = await commentCollections.insertOne(commentDetails);
+      res.send(result);
+    })
+
+    // Get All comment of a particular question
+
+    app.get("/copq/:qId", async (req, res) => {
+      const questionId = req.params.qId;
+      console.log(langId);
+      const query = { questionId: questionId }
+      const result = await commentCollections.find(query).sort({ createdAt: -1 }).toArray();
+      // console.log(result)
       res.send(result);
     })
 
