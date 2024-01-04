@@ -110,8 +110,21 @@ async function run() {
       res.send(result);
     })
 
+    // Get all Module
+
     app.get("/all-module", async (req, res) => {
       const result = await moduleCollections.find().toArray();
+      res.send(result);
+    })
+
+    // Get All Module of a particular Language
+
+    app.get("/pml/:langId", async (req, res) => {
+      const langId = req.params.langId;
+      console.log(langId);
+      const query = { langID: langId }
+      const result = await moduleCollections.find(query).toArray();
+      console.log(result)
       res.send(result);
     })
 
