@@ -122,10 +122,10 @@ async function run() {
 
     app.get("/pml/:langId", async (req, res) => {
       const langId = req.params.langId;
-      console.log(langId);
+      // console.log(langId);
       const query = { langID: langId }
       const result = await moduleCollections.find(query).toArray();
-      console.log(result)
+      // console.log(result)
       res.send(result);
     })
 
@@ -150,7 +150,7 @@ async function run() {
 
     app.get("/copq/:qId", async (req, res) => {
       const questionId = req.params.qId;
-      console.log(langId);
+      // console.log(langId);
       const query = { questionId: questionId }
       const result = await commentCollections.find(query).sort({ createdAt: -1 }).toArray();
       // console.log(result)
