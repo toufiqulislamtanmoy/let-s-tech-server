@@ -35,6 +35,7 @@ async function run() {
     const moduleCollections = client.db("language-learning").collection("modules");
     const questionsCollections = client.db("language-learning").collection("questions");
     const commentCollections = client.db("language-learning").collection("comment");
+    const quizCollections = client.db("language-learning").collection("quiz");
 
     /********Create user*******/
     app.post("/users", async (req, res) => {
@@ -157,7 +158,31 @@ async function run() {
       res.send(result);
     })
 
+    // add quiz 
+    app.post("/addQuizQuestions", async (req, res) => {
+      const quizDetails = req.body;
+      const query = { questionText: quizDetails.questionText };
+      const existingModule = await quizCollections.findOne(query);
+      if (existingModule) {
+        return res.send({ message: "Already Added this question" });
+      }
+      const result = await quizCollections.insertOne(quizDetails);
+      res.send(result);
+    })
 
+    app.get("/getQuestions/:qId", async (req, res) => {
+      const langId = req.params.qId;
+      // console.log(langId);
+      const query = { langID: langId }
+      const result = await quizCollections.find(query).sort({ createdAt: -1 }).toArray();
+      res.send(result);
+    })
+    app.delete("/deleteQuestion/:id", async (req, res) => {
+      const quizId = req.params.id;
+      const query = { _id: new ObjectId(quizId) }
+      const result = await quizCollections.deleteOne(query);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
