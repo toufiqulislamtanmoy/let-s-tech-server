@@ -36,6 +36,7 @@ async function run() {
     const questionsCollections = client.db("language-learning").collection("questions");
     const commentCollections = client.db("language-learning").collection("comment");
     const quizCollections = client.db("language-learning").collection("quiz");
+    const progressCollections = client.db("language-learning").collection("progress");
 
     /********Create user*******/
     app.post("/users", async (req, res) => {
@@ -181,6 +182,17 @@ async function run() {
       const quizId = req.params.id;
       const query = { _id: new ObjectId(quizId) }
       const result = await quizCollections.deleteOne(query);
+      res.send(result);
+    })
+
+    app.post("/progress", async (req, res) => {
+      const progressData = req.body;
+      const result = await progressCollections.insertOne(progressData);
+      res.send(result);
+    })
+    app.get("/progressReport/:email", async (req, res) => {
+      const progressEmail = req.params.email;
+      const result = await progressCollections.find({ email: progressEmail }).toArray();
       res.send(result);
     })
 
